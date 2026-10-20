@@ -1,0 +1,22 @@
+{
+  "name": "tizenbrew-rozcestnik",
+  "version": "1.4.2",
+  "description": "Rozcestník TV module for TizenBrew on Samsung Smart TV",
+  "main": "index.html",
+  "serviceFile": "service.js",
+  "packageType": "app",
+  "appName": "Rozcestník",
+  "appPath": "index.html",
+  "icon": "icon.png",
+  "evaluateScriptOnDocumentStart": false,
+  "keys": [
+    "MediaPlay",
+    "MediaPause",
+    "MediaPlayPause",
+    "MediaStop",
+    "MediaFastForward",
+    "MediaRewind"
+  ],
+  "author": "Yasuoyone",
+  "license": "MIT"
+}
