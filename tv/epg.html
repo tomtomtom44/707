@@ -1872,6 +1872,7 @@
               els.video.addEventListener('loadeddata', () => els.video.removeAttribute('poster'));
               els.video.addEventListener('canplay', () => els.video.removeAttribute('poster'));
             }
+          }
           if (typeof TizenAVPlay !== 'undefined' && TizenAVPlay.isAvailable()) {
             console.log('[EPG] Playing via Samsung AVPlay:', u);
             const container = $("player-container-el") || (els.video ? els.video.parentElement : null);
@@ -4163,7 +4164,7 @@
               els.lo.classList.add("hidden");
               els.lo.style.display = "none";
             }
-          } else if (_loadGridAttempts < 20) {
+          } else if (_loadGridAttempts < 200) {
             setTimeout(loadCategoriesAndGrid, 150);
           } else {
             console.warn('[EPG] Channels load timed out, rendering available categories');
@@ -5213,7 +5214,16 @@
       function triggerInitApp() {
         if (appInitialized) return;
         appInitialized = true;
-        initApp();
+        try {
+          initApp();
+        } catch (err) {
+          console.error('[EPG] initApp failed:', err);
+          var overlay = document.getElementById('loading-overlay');
+          if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+          }
+        }
       }
 
       if (document.readyState === "complete" || document.readyState === "interactive") {

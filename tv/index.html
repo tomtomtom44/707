@@ -193,60 +193,150 @@
     box-shadow: 0 0 20px rgba(255, 59, 59, 0.9) !important;
     transform: scale(1.15) !important;
 }
-.player-tv-controls {
+.tv-player-bar {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 1.5rem 2.5rem 2rem;
-    background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+    padding: 1.5rem 3rem 2rem;
+    background: linear-gradient(0deg, rgba(6, 8, 13, 0.95) 0%, rgba(6, 8, 13, 0.6) 70%, transparent 100%);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    z-index: 20;
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    gap: 0.8rem;
+    z-index: 25;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
     pointer-events: auto;
 }
-.player-overlay.controls-hidden .player-tv-controls {
+.player-overlay.controls-hidden .tv-player-bar {
     transform: translateY(100%);
     opacity: 0;
     pointer-events: none;
 }
-.player-ctrls-bar {
+.player-overlay.controls-hidden .player-header {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+.tv-bar-progress {
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    width: 100%;
 }
-.tv-ctrl-btn {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+.tv-bar-time {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    font-variant-numeric: tabular-nums;
+    min-width: 45px;
+}
+.tv-bar-timeline {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+.tv-bar-timeline-fill {
+    height: 100%;
+    background: var(--accent, #FFC629);
+    border-radius: 2px;
+}
+.tv-bar-badge-live {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ff3b3b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+}
+.tv-bar-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.tv-btn {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
     color: #fff;
-    padding: 0.65rem 1.4rem;
-    border-radius: 40px;
+    padding: 0.6rem 1.4rem;
+    border-radius: 30px;
     font-size: 0.95rem;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
 }
-.tv-ctrl-btn:hover, .tv-ctrl-btn:focus, .tv-ctrl-btn:focus-visible {
-    background: var(--accent, #FFC629) !important;
-    color: #000 !important;
-    border-color: var(--accent, #FFC629) !important;
-    box-shadow: 0 0 20px rgba(255, 198, 41, 0.8) !important;
+.tv-btn:hover, .tv-btn:focus, .tv-btn:focus-visible {
+    background: #FFC629 !important;
+    color: #000000 !important;
+    border-color: #FFC629 !important;
+    box-shadow: 0 0 22px rgba(255, 198, 41, 0.9) !important;
     transform: scale(1.08) !important;
 }
-.tv-ctrl-hint {
-    margin-left: auto;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
+.tv-menu-container {
+    position: relative;
+}
+.tv-quality-dropdown {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    width: 280px;
+    background: #0c1018;
+    border: 1.5px solid rgba(255, 198, 41, 0.5);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+    padding: 8px;
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 50;
+}
+.tv-quality-dropdown.hidden {
+    display: none !important;
+}
+.tv-dropdown-header {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #FFC629;
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.tv-dropdown-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+.tv-dropdown-item {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.15s ease;
+}
+.tv-dropdown-item:hover, .tv-dropdown-item:focus, .tv-dropdown-item:focus-visible {
+    background: #FFC629 !important;
+    color: #000 !important;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(255, 198, 41, 0.8) !important;
+    transform: scale(1.04) !important;
+}
+.tv-dropdown-item.active {
+    border-color: #FFC629;
+    color: #FFC629;
 }
 .player-hw-badge {
     background: rgba(0, 0, 0, 0.6);
@@ -267,55 +357,6 @@
     border-radius: 50%;
     display: inline-block;
     box-shadow: 0 0 8px #ff3b3b;
-}
-.tv-quality-popup {
-    background: #11141e;
-    border: 1px solid rgba(255, 198, 41, 0.4);
-    border-radius: 14px;
-    padding: 1rem;
-    width: 320px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.85);
-    position: absolute;
-    bottom: 80px;
-    left: 140px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    z-index: 30;
-}
-.tv-quality-popup.hidden {
-    display: none !important;
-}
-.tv-quality-title {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #FFC629;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.3rem;
-}
-.tv-q-item {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: #fff;
-    padding: 0.55rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: left;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-    outline: none;
-}
-.tv-q-item:hover, .tv-q-item:focus, .tv-q-item:focus-visible {
-    background: #FFC629 !important;
-    color: #000 !important;
-    font-weight: 700;
-    box-shadow: 0 0 15px rgba(255, 198, 41, 0.7);
-}
-.tv-q-item.active {
-    border-color: #FFC629;
-    color: #FFC629;
-    font-weight: 600;
 }
 .shaka-big-buttons-container,
 .shaka-play-button-container,
@@ -417,26 +458,31 @@
     <div class="video-container" data-shaka-player-container id="shaka-container">
         <video id="video" data-shaka-player autoplay playsinline webkit-playsinline referrerpolicy="no-referrer" style="width:100% !important;height:100% !important;object-fit:contain !important;background:#000 !important;transform:translateZ(0) !important;-webkit-transform:translateZ(0) !important;outline:none !important;"></video>
     </div>
-    <!-- TV Player Controls Overlay -->
-    <div class="player-tv-controls" id="player-tv-controls">
-        <div class="player-ctrls-bar">
-            <button class="tv-ctrl-btn" id="ctrl-btn-playpause" tabindex="0" title="Přehrát / Pozastavit (OK)">
-                <i class="fas fa-pause"></i> <span id="ctrl-playpause-text">Pauza</span>
-            </button>
-            <button class="tv-ctrl-btn" id="ctrl-btn-quality" tabindex="0" title="Kvalita videa">
-                <i class="fas fa-sliders-h"></i> <span id="ctrl-quality-label">Kvalita (Auto)</span>
-            </button>
-            <button class="tv-ctrl-btn" id="ctrl-btn-stop" tabindex="0" title="Ukončit kanál">
-                <i class="fas fa-times"></i> <span>Zavřít kanál</span>
-            </button>
-            <div class="tv-ctrl-hint">
-                <i class="fas fa-info-circle"></i> Šipky / OK = ovládání &nbsp;|&nbsp; <strong>ZPĚT</strong> = návrat na kanály
+    <!-- TV Player Controls Bar -->
+    <div class="tv-player-bar" id="tv-player-bar">
+        <div class="tv-bar-progress">
+            <div class="tv-bar-time" id="tv-bar-time">00:00</div>
+            <div class="tv-bar-timeline">
+                <div class="tv-bar-timeline-fill" id="tv-bar-timeline-fill" style="width: 100%;"></div>
             </div>
+            <div class="tv-bar-badge-live"><span class="live-dot"></span> ŽIVĚ</div>
         </div>
-        <!-- Quality Selection Popup -->
-        <div class="tv-quality-popup hidden" id="tv-quality-popup">
-            <div class="tv-quality-title">Kvalita videa</div>
-            <div class="tv-quality-list" id="tv-quality-list"></div>
+        <div class="tv-bar-buttons">
+            <button class="tv-btn" id="btn-play-pause" tabindex="0" title="Přehrát / Pozastavit">
+                <i class="fas fa-pause"></i> <span id="lbl-play-pause">Pauza</span>
+            </button>
+            <div class="tv-menu-container">
+                <button class="tv-btn" id="btn-quality" tabindex="0" title="Výběr kvality">
+                    <i class="fas fa-sliders-h"></i> <span id="lbl-quality">Kvalita (Auto)</span>
+                </button>
+                <div class="tv-quality-dropdown hidden" id="tv-quality-dropdown">
+                    <div class="tv-dropdown-header">Volba kvality (HW)</div>
+                    <div class="tv-dropdown-items" id="tv-quality-items"></div>
+                </div>
+            </div>
+            <button class="tv-btn" id="btn-fullscreen" tabindex="0" title="Celá obrazovka">
+                <i class="fas fa-expand"></i> <span>Obrazovka</span>
+            </button>
         </div>
     </div>
     <div id="audio-fallback" class="audio-fallback" style="display:none;">
@@ -1035,8 +1081,8 @@ async function closePlayer(){
     if (typeof TizenAVPlay !== 'undefined') {
         try { TizenAVPlay.stop(); } catch(e) {}
     }
-    var qPopup = document.getElementById('tv-quality-popup');
-    if (qPopup) qPopup.classList.add('hidden');
+    var qDropdown = document.getElementById('tv-quality-dropdown');
+    if (qDropdown) qDropdown.classList.add('hidden');
     if (typeof window.AndroidNative !== "undefined" && window.AndroidNative.setFullscreen) {
         try { window.AndroidNative.setFullscreen(false); } catch (e) {}
     }
@@ -1284,89 +1330,110 @@ if (shakaContainer) {
 var controlsTimeout;
 var isHoveringHeader = false;
 
-var ctrlBtnPlayPause = document.getElementById('ctrl-btn-playpause');
-var ctrlBtnQuality = document.getElementById('ctrl-btn-quality');
-var ctrlBtnStop = document.getElementById('ctrl-btn-stop');
-var ctrlPlayPauseText = document.getElementById('ctrl-playpause-text');
-var ctrlQualityLabel = document.getElementById('ctrl-quality-label');
-var tvQualityPopup = document.getElementById('tv-quality-popup');
-var tvQualityList = document.getElementById('tv-quality-list');
+var btnPlayPause = document.getElementById('btn-play-pause');
+var btnQuality = document.getElementById('btn-quality');
+var btnFullscreen = document.getElementById('btn-fullscreen');
+var lblPlayPause = document.getElementById('lbl-play-pause');
+var lblQuality = document.getElementById('lbl-quality');
+var tvQualityDropdown = document.getElementById('tv-quality-dropdown');
+var tvQualityItems = document.getElementById('tv-quality-items');
+var tvBarTime = document.getElementById('tv-bar-time');
 var playerSourceInfo = document.getElementById('player-source-info');
 
-function togglePlayPause() {
+// Clock ticker for the bottom bar
+setInterval(function() {
+    if (tvBarTime) {
+        var d = new Date();
+        var hh = d.getHours() < 10 ? '0' + d.getHours() : d.getHours();
+        var mm = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+        tvBarTime.textContent = hh + ':' + mm;
+    }
+}, 1000);
+
+function handlePlayPause() {
     if (typeof TizenAVPlay !== 'undefined' && TizenAVPlay.isAvailable() && TizenAVPlay.getCurrentUrl()) {
         TizenAVPlay.togglePlayPause();
         var isPl = TizenAVPlay.isPlaying();
-        if (ctrlBtnPlayPause) {
-            ctrlBtnPlayPause.innerHTML = isPl ? '<i class="fas fa-pause"></i> <span id="ctrl-playpause-text">Pauza</span>' : '<i class="fas fa-play"></i> <span id="ctrl-playpause-text">Přehrát</span>';
-        }
+        updatePlayPauseUI(isPl);
     } else if (videoElem) {
         if (videoElem.paused) {
             videoElem.play().catch(function(){});
-            if (ctrlBtnPlayPause) ctrlBtnPlayPause.innerHTML = '<i class="fas fa-pause"></i> <span id="ctrl-playpause-text">Pauza</span>';
+            updatePlayPauseUI(true);
         } else {
             videoElem.pause();
-            if (ctrlBtnPlayPause) ctrlBtnPlayPause.innerHTML = '<i class="fas fa-play"></i> <span id="ctrl-playpause-text">Přehrát</span>';
+            updatePlayPauseUI(false);
         }
     }
 }
 
-function toggleQualityMenu() {
-    if (!tvQualityPopup) return;
-    if (!tvQualityPopup.classList.contains('hidden')) {
-        tvQualityPopup.classList.add('hidden');
-        if (ctrlBtnQuality) ctrlBtnQuality.focus();
+function updatePlayPauseUI(isPlaying) {
+    if (!btnPlayPause) return;
+    if (isPlaying) {
+        btnPlayPause.innerHTML = '<i class="fas fa-pause"></i> <span id="lbl-play-pause">Pauza</span>';
+    } else {
+        btnPlayPause.innerHTML = '<i class="fas fa-play"></i> <span id="lbl-play-pause">Přehrát</span>';
+    }
+}
+
+function openQualityMenu() {
+    if (!tvQualityDropdown) return;
+    if (!tvQualityDropdown.classList.contains('hidden')) {
+        tvQualityDropdown.classList.add('hidden');
+        if (btnQuality) btnQuality.focus();
         return;
     }
-    tvQualityList.innerHTML = '';
+    tvQualityItems.innerHTML = '';
+    
+    // Auto quality option
+    var autoBtn = document.createElement('button');
+    autoBtn.className = 'tv-dropdown-item active';
+    autoBtn.setAttribute('tabindex', '0');
+    autoBtn.innerHTML = '<i class="fas fa-check" style="margin-right:6px"></i> Auto (Hardware)';
+    autoBtn.onclick = function() {
+        if (lblQuality) lblQuality.textContent = 'Kvalita (Auto)';
+        tvQualityDropdown.classList.add('hidden');
+        if (btnQuality) btnQuality.focus();
+    };
+    autoBtn.onkeydown = function(ev) {
+        if (ev.keyCode === 13 || ev.key === 'Enter') { ev.preventDefault(); autoBtn.click(); }
+    };
+    tvQualityItems.appendChild(autoBtn);
+
     var tracks = [];
     if (typeof TizenAVPlay !== 'undefined' && TizenAVPlay.isAvailable() && typeof TizenAVPlay.getVideoTracks === 'function') {
         tracks = TizenAVPlay.getVideoTracks();
     }
     
-    // Auto quality option
-    var autoBtn = document.createElement('button');
-    autoBtn.className = 'tv-q-item active';
-    autoBtn.setAttribute('tabindex', '0');
-    autoBtn.innerHTML = '<i class="fas fa-check" style="margin-right:6px"></i> Automatická kvalita (HW)';
-    autoBtn.onclick = function() {
-        if (ctrlQualityLabel) ctrlQualityLabel.textContent = 'Kvalita (Auto)';
-        tvQualityPopup.classList.add('hidden');
-        if (ctrlBtnQuality) ctrlBtnQuality.focus();
-    };
-    autoBtn.onkeydown = function(ev) {
-        if (ev.keyCode === 13 || ev.key === 'Enter') { ev.preventDefault(); autoBtn.click(); }
-    };
-    tvQualityList.appendChild(autoBtn);
-
     if (tracks && tracks.length) {
         tracks.forEach(function(tr) {
             var btn = document.createElement('button');
-            btn.className = 'tv-q-item';
+            btn.className = 'tv-dropdown-item';
             btn.setAttribute('tabindex', '0');
             btn.textContent = tr.label || ('Stopa ' + tr.index);
             btn.onclick = function() {
                 if (typeof TizenAVPlay !== 'undefined' && typeof TizenAVPlay.setVideoTrack === 'function') {
                     TizenAVPlay.setVideoTrack(tr.index);
                 }
-                if (ctrlQualityLabel) ctrlQualityLabel.textContent = tr.label;
-                tvQualityPopup.classList.add('hidden');
-                if (ctrlBtnQuality) ctrlBtnQuality.focus();
+                if (lblQuality) lblQuality.textContent = tr.label;
+                tvQualityDropdown.classList.add('hidden');
+                if (btnQuality) btnQuality.focus();
             };
             btn.onkeydown = function(ev) {
                 if (ev.keyCode === 13 || ev.key === 'Enter') { ev.preventDefault(); btn.click(); }
             };
-            tvQualityList.appendChild(btn);
+            tvQualityItems.appendChild(btn);
         });
     }
 
-    tvQualityPopup.classList.remove('hidden');
+    tvQualityDropdown.classList.remove('hidden');
     autoBtn.focus();
 }
 
-if (ctrlBtnPlayPause) ctrlBtnPlayPause.onclick = togglePlayPause;
-if (ctrlBtnQuality) ctrlBtnQuality.onclick = toggleQualityMenu;
-if (ctrlBtnStop) ctrlBtnStop.onclick = closePlayer;
+if (btnPlayPause) btnPlayPause.onclick = handlePlayPause;
+if (btnQuality) btnQuality.onclick = openQualityMenu;
+if (btnFullscreen) btnFullscreen.onclick = function() {
+    toggleFullscreen(playerOverlay, videoElem);
+};
 
 function showControls(focusTarget) {
     playerOverlay.classList.remove('controls-hidden');
@@ -1381,7 +1448,7 @@ function showControls(focusTarget) {
 
 function hideControls() {
     if (playerOverlay.classList.contains('active') && !isHoveringHeader && audioFallbackDiv.style.display !== 'flex') {
-        if (tvQualityPopup && !tvQualityPopup.classList.contains('hidden')) {
+        if (tvQualityDropdown && !tvQualityDropdown.classList.contains('hidden')) {
             clearTimeout(controlsTimeout);
             controlsTimeout = setTimeout(hideControls, 6000);
             return;
@@ -1408,11 +1475,11 @@ playerOverlay.addEventListener('pointermove', () => showControls());
 playerOverlay.addEventListener('click', () => showControls());
 
 videoElem.addEventListener('play', () => {
-    if (ctrlBtnPlayPause) ctrlBtnPlayPause.innerHTML = '<i class="fas fa-pause"></i> <span id="ctrl-playpause-text">Pauza</span>';
+    updatePlayPauseUI(true);
     showControls();
 });
 videoElem.addEventListener('pause', () => {
-    if (ctrlBtnPlayPause) ctrlBtnPlayPause.innerHTML = '<i class="fas fa-play"></i> <span id="ctrl-playpause-text">Přehrát</span>';
+    updatePlayPauseUI(false);
     showControls();
 });
 
@@ -1427,30 +1494,50 @@ window.addEventListener('keydown', (e) => {
         if (isBack) {
             e.preventDefault();
             e.stopPropagation();
-            if (tvQualityPopup && !tvQualityPopup.classList.contains('hidden')) {
-                tvQualityPopup.classList.add('hidden');
-                if (ctrlBtnQuality) ctrlBtnQuality.focus();
+            if (tvQualityDropdown && !tvQualityDropdown.classList.contains('hidden')) {
+                tvQualityDropdown.classList.add('hidden');
+                if (btnQuality) btnQuality.focus();
                 return;
             }
             closePlayer();
             return;
         }
 
-        // Space / MediaPlayPause toggles playback
-        if (e.keyCode === 32 || e.keyCode === 179 || e.keyCode === 10252) {
+        // Space / MediaPlayPause toggles playback (32, 179, 10252, 415, 19)
+        if (e.keyCode === 32 || e.keyCode === 179 || e.keyCode === 10252 || e.keyCode === 415 || e.keyCode === 19) {
             e.preventDefault();
             e.stopPropagation();
-            togglePlayPause();
+            handlePlayPause();
             showControls();
             return;
         }
 
-        // If controls were hidden, ANY key wakes them up and focuses the close button or controls
+        // If quality dropdown is open, handle Up/Down navigation within it
+        if (tvQualityDropdown && !tvQualityDropdown.classList.contains('hidden')) {
+            var qItems = Array.from(tvQualityDropdown.querySelectorAll('.tv-dropdown-item'));
+            var activeIdx = qItems.indexOf(document.activeElement);
+            if (e.keyCode === 38) { // Up
+                e.preventDefault();
+                var prevIdx = activeIdx > 0 ? activeIdx - 1 : qItems.length - 1;
+                if (qItems[prevIdx]) qItems[prevIdx].focus();
+                return;
+            }
+            if (e.keyCode === 40) { // Down
+                e.preventDefault();
+                var nextIdx = activeIdx < qItems.length - 1 ? activeIdx + 1 : 0;
+                if (qItems[nextIdx]) qItems[nextIdx].focus();
+                return;
+            }
+            showControls();
+            return;
+        }
+
+        // If controls were hidden, ANY key wakes them up and focuses the main button
         var isHidden = playerOverlay.classList.contains('controls-hidden');
         if (isHidden) {
             e.preventDefault();
             e.stopPropagation();
-            showControls(closePlayerBtn || ctrlBtnPlayPause);
+            showControls(btnPlayPause || closePlayerBtn);
             return;
         } else {
             // Controls visible: keep timer alive
@@ -1459,15 +1546,47 @@ window.addEventListener('keydown', (e) => {
 
         // Up arrow: focus close button at top
         if (e.keyCode === 38) {
-            if (closePlayerBtn && document.activeElement !== closePlayerBtn) {
-                closePlayerBtn.focus();
-                return;
+            if (document.activeElement === btnPlayPause || document.activeElement === btnQuality || document.activeElement === btnFullscreen) {
+                if (closePlayerBtn) {
+                    e.preventDefault();
+                    closePlayerBtn.focus();
+                    return;
+                }
             }
         }
         // Down arrow: focus controls at bottom
         if (e.keyCode === 40) {
-            if (ctrlBtnPlayPause && document.activeElement === closePlayerBtn) {
-                ctrlBtnPlayPause.focus();
+            if (document.activeElement === closePlayerBtn) {
+                if (btnPlayPause) {
+                    e.preventDefault();
+                    btnPlayPause.focus();
+                    return;
+                }
+            }
+        }
+        // Right arrow: cycle through bottom controls (Play/Pause -> Quality -> Fullscreen)
+        if (e.keyCode === 39) {
+            if (document.activeElement === btnPlayPause && btnQuality) {
+                e.preventDefault();
+                btnQuality.focus();
+                return;
+            }
+            if (document.activeElement === btnQuality && btnFullscreen) {
+                e.preventDefault();
+                btnFullscreen.focus();
+                return;
+            }
+        }
+        // Left arrow: cycle back through bottom controls (Fullscreen -> Quality -> Play/Pause)
+        if (e.keyCode === 37) {
+            if (document.activeElement === btnFullscreen && btnQuality) {
+                e.preventDefault();
+                btnQuality.focus();
+                return;
+            }
+            if (document.activeElement === btnQuality && btnPlayPause) {
+                e.preventDefault();
+                btnPlayPause.focus();
                 return;
             }
         }
