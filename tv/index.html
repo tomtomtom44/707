@@ -367,6 +367,10 @@
     display: none !important;
 }
 
+.tv-player-bar {
+    display: none !important;
+}
+
 .top-back-btn {
     display: inline-flex;
     align-items: center;
@@ -458,8 +462,8 @@
     <div class="video-container" data-shaka-player-container id="shaka-container">
         <video id="video" data-shaka-player autoplay playsinline webkit-playsinline referrerpolicy="no-referrer" style="width:100% !important;height:100% !important;object-fit:contain !important;background:#000 !important;transform:translateZ(0) !important;-webkit-transform:translateZ(0) !important;outline:none !important;"></video>
     </div>
-    <!-- TV Player Controls Bar -->
-    <div class="tv-player-bar" id="tv-player-bar">
+    <!-- TV Player Controls Bar (disabled in favor of native Shaka Player bar) -->
+    <div class="tv-player-bar" id="tv-player-bar" style="display:none !important;">
         <div class="tv-bar-progress">
             <div class="tv-bar-time" id="tv-bar-time">00:00</div>
             <div class="tv-bar-timeline">
@@ -846,17 +850,24 @@ async function initShakaOnce(){
     }
     ui.configure({
         doubleClickForFullscreen: false,
-        fadeDelay: 8,
+        fadeDelay: 5,
         bigButtons: [],
         controlPanelElements: [
             'play_pause',
+            'time_and_duration',
             'mute',
             'volume',
-            'time_and_duration',
             'spacer',
             'overflow_menu',
             'fullscreen'
-        ]
+        ],
+        overflowMenuButtons: [
+            'quality',
+            'language',
+            'captions',
+            'playback_rate'
+        ],
+        addSeekBar: true
     });
     shakaControls=ui.getControls();
     shakaPlayer=shakaControls.getPlayer();
@@ -1438,6 +1449,9 @@ if (btnFullscreen) btnFullscreen.onclick = function() {
 function showControls(focusTarget) {
     playerOverlay.classList.remove('controls-hidden');
     clearTimeout(controlsTimeout);
+    if (shakaControls && typeof shakaControls.showControls === 'function') {
+        shakaControls.showControls();
+    }
     if (playerOverlay.classList.contains('active') && audioFallbackDiv.style.display !== 'flex') {
         controlsTimeout = setTimeout(hideControls, 6000);
     }
@@ -1532,62 +1546,43 @@ window.addEventListener('keydown', (e) => {
             return;
         }
 
-        // If controls were hidden, ANY key wakes them up and focuses the main button
+        // If controls were hidden, ANY key wakes them up
         var isHidden = playerOverlay.classList.contains('controls-hidden');
+        if (shakaControls && typeof shakaControls.showControls === 'function') {
+            shakaControls.showControls();
+        }
         if (isHidden) {
             e.preventDefault();
             e.stopPropagation();
-            showControls(btnPlayPause || closePlayerBtn);
+            showControls(closePlayerBtn);
             return;
         } else {
             // Controls visible: keep timer alive
             showControls();
         }
 
-        // Up arrow: focus close button at top
+        // Up arrow: focus close button at top from Shaka controls
         if (e.keyCode === 38) {
-            if (document.activeElement === btnPlayPause || document.activeElement === btnQuality || document.activeElement === btnFullscreen) {
-                if (closePlayerBtn) {
-                    e.preventDefault();
-                    closePlayerBtn.focus();
-                    return;
+            if (shakaContainer && shakaContainer.contains(document.activeElement)) {
+                if (!document.activeElement.closest('.shaka-overflow-menu, .shaka-settings-menu')) {
+                    if (closePlayerBtn) {
+                        e.preventDefault();
+                        closePlayerBtn.focus();
+                        return;
+                    }
                 }
             }
         }
-        // Down arrow: focus controls at bottom
+        // Down arrow: from close button down into Shaka controls
         if (e.keyCode === 40) {
             if (document.activeElement === closePlayerBtn) {
-                if (btnPlayPause) {
+                var shakaBtn = shakaContainer ? shakaContainer.querySelector('.shaka-play-pause-btn, .shaka-overflow-menu-button, .shaka-controls-container button') : null;
+                if (shakaBtn) {
                     e.preventDefault();
-                    btnPlayPause.focus();
+                    if (shakaControls && typeof shakaControls.showControls === 'function') shakaControls.showControls();
+                    shakaBtn.focus();
                     return;
                 }
-            }
-        }
-        // Right arrow: cycle through bottom controls (Play/Pause -> Quality -> Fullscreen)
-        if (e.keyCode === 39) {
-            if (document.activeElement === btnPlayPause && btnQuality) {
-                e.preventDefault();
-                btnQuality.focus();
-                return;
-            }
-            if (document.activeElement === btnQuality && btnFullscreen) {
-                e.preventDefault();
-                btnFullscreen.focus();
-                return;
-            }
-        }
-        // Left arrow: cycle back through bottom controls (Fullscreen -> Quality -> Play/Pause)
-        if (e.keyCode === 37) {
-            if (document.activeElement === btnFullscreen && btnQuality) {
-                e.preventDefault();
-                btnQuality.focus();
-                return;
-            }
-            if (document.activeElement === btnQuality && btnPlayPause) {
-                e.preventDefault();
-                btnPlayPause.focus();
-                return;
             }
         }
     } else {

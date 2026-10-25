@@ -1326,6 +1326,19 @@
       };
       window.fT = (s) => {
         if (!s) return new Date();
+        var clean = s.trim();
+        var m = clean.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(?:\s*([+-]\d{4}))?/);
+        if (m) {
+          var yr = m[1], mo = m[2], da = m[3], hr = m[4], mi = m[5], se = m[6], tz = m[7];
+          if (tz) {
+            var tzSign = tz.charAt(0);
+            var tzHours = tz.substr(1, 2);
+            var tzMins = tz.substr(3, 2);
+            var isoStr = `${yr}-${mo}-${da}T${hr}:${mi}:${se}${tzSign}${tzHours}:${tzMins}`;
+            var d = new Date(isoStr);
+            if (!isNaN(d.getTime())) return d;
+          }
+        }
         return new Date(
           s.slice(0, 4),
           s.slice(4, 6) - 1,
@@ -1659,9 +1672,38 @@
       let savedGridScrollTop = 0;
       let savedGridScrollLeft = 0;
 
-      async function resPl(n, s, e) {
+      function seekShakaToArchive(targetDate) {
+        if (!sp || !targetDate) return;
+        const doSeek = () => {
+          try {
+            const range = sp.seekRange() || { start: 0, end: 0 };
+            if (sp.isLive()) {
+              const secondsBehind = Math.max(0, (Date.now() - targetDate.getTime()) / 1000);
+              const targetCurrentTime = Math.max(range.start, range.end - secondsBehind);
+              if (targetCurrentTime >= range.start && targetCurrentTime <= range.end) {
+                els.video.currentTime = targetCurrentTime;
+              } else {
+                els.video.currentTime = range.start;
+              }
+            } else {
+              els.video.currentTime = range.start || 0;
+            }
+          } catch(err) {
+            console.warn("Chyba při skoku do archivu v Shaka:", err);
+          }
+        };
+        doSeek();
+        setTimeout(doSeek, 300);
+        setTimeout(doSeek, 800);
+        setTimeout(doSeek, 1500);
+      }
+
+      async function resPl(n, s, e, isArchive = false) {
         if (hd) return;
-        if (!s) {
+        if (!isArchive) {
+          s = null;
+          e = null;
+        } else if (!s) {
           const programs = gEpg(n) || [];
           const now = new Date();
           const curProg = programs.find(
@@ -1687,7 +1729,7 @@
           if (ov) ov.classList.add("active");
         }
         currentPlayingChannel = n;
-        if (s && e) {
+        if (isArchive && s && e) {
           currentActiveProgram = {
             title: "",
             start: s,
@@ -1700,7 +1742,7 @@
           if (active) {
             currentActiveProgram = active;
           }
-        } else {
+        } else if (isArchive && s) {
           const _curProgs = gEpg(n) || [];
           const _curP = _curProgs.find((p) => s >= p.start && s < p.stop);
           currentActiveProgram = _curP ?
@@ -1714,6 +1756,8 @@
               start: s,
               stop: new Date(s.getTime() + 72e5)
             };
+        } else {
+          currentActiveProgram = null;
         }
         try {
           const r = await fetch(
@@ -1745,7 +1789,7 @@
               const txt = await f.text();
               u = txt.trim().replace(/([?&])(cf_clearance|clearance)=[^&]*/g, '').replace(/\?&/, '?').replace(/&&+/, '&').replace(/[?&]$/, '');
             }
-            if (s) {
+            if (isArchive && s) {
               let uS = Math.floor(s.getTime() / 1e3);
               let uE = e ? Math.floor(e.getTime() / 1e3) : null;
               if (u.includes("cetin.cz")) {
@@ -1773,35 +1817,27 @@
                   } catch (err) {}
                 }
                 u = u
-                  .replace(/([?&])(begin|end|from|to)=[^&]*/g, "$1")
+                  .replace(/([?&])(begin|end|from|to|start)=[^&]*/g, "$1")
                   .replace(/\?&/, "?")
                   .replace(/&&+/, "&")
                   .replace(/[?&]$/, "");
                 u +=
                   (u.includes("?") ? "&" : "?") +
                   "begin=" +
-                  uS +
-                  (uE ? "&end=" + uE : "");
+                  uS;
               } else if (u.includes("mazana.tv")) {
                 u = u
-                  .replace(/([?&])(begin|end|from|to)=[^&]*/g, "")
+                  .replace(/([?&])(begin|end|from|to|start)=[^&]*/g, "")
                   .replace(/\?&/, "?")
                   .replace(/&&+/, "&")
                   .replace(/[?&]$/, "");
-                if (uS) {
-                  const nowSec = Math.floor(Date.now() / 1e3);
-                  const isLiveNow = !e ||
-                    (uS <= nowSec && Math.floor(e.getTime() / 1e3) > nowSec);
-                  if (!isLiveNow) {
-                    let uE_m = uE && uE > uS ? uE : uS + 7200;
-                    u +=
-                      (u.includes("?") ? "&" : "?") +
-                      "from=" +
-                      uS +
-                      "&to=" +
-                      uE_m;
-                  }
-                }
+                let uE_m = uE && uE > uS ? uE : uS + 7200;
+                u +=
+                  (u.includes("?") ? "&" : "?") +
+                  "from=" +
+                  uS +
+                  "&to=" +
+                  uE_m;
               } else if (u.includes("aw-ucdn")) {
                 const p2 = (n) => n.toString().padStart(2, "0");
                 const qs =
@@ -1826,11 +1862,16 @@
                     "Z" :
                     "");
                 u = u
-                  .replace(/([?&])(begin|end|from|to)=[^&]*/g, "$1")
+                  .replace(/([?&])(begin|end|from|to|start)=[^&]*/g, "$1")
                   .replace(/\?&/, "?")
                   .replace(/&&+/, "&")
                   .replace(/[?&]$/, "");
                 u += (u.includes("?") ? "&" : "?") + qs;
+              } else if (u.includes("viaplay.tv") || u.includes("viaplay")) {
+                u = u.replace(/([?&])(begin|end|from|to|start)=[^&]*/g, "$1").replace(/\?&/, "?").replace(/&&+/, "&").replace(/[?&]$/, "");
+                if (!u.includes("/vp-vsultra/")) {
+                  u += (u.includes("?") ? "&" : "?") + "start=" + uS;
+                }
               }
             }
           } catch (err) {
@@ -1883,6 +1924,23 @@
                 console.log('[EPG] AVPlay playing');
                 updatePlayerEPG(n);
                 startPlayerTicker();
+                if (isArchive && s && typeof TizenAVPlay.seekTo === 'function') {
+                  setTimeout(function() {
+                    try {
+                      var secondsBehind = Math.max(0, (Date.now() - s.getTime()) / 1000);
+                      var dur = 0;
+                      if (typeof webapis !== 'undefined' && webapis.avplay && typeof webapis.avplay.getDuration === 'function') {
+                        dur = webapis.avplay.getDuration();
+                      }
+                      if (dur > 0 && secondsBehind > 10) {
+                        var targetMs = Math.max(0, dur - (secondsBehind * 1000));
+                        TizenAVPlay.seekTo(targetMs);
+                      }
+                    } catch(avErr) {
+                      console.warn('[EPG] AVPlay archive seek warning:', avErr);
+                    }
+                  }, 800);
+                }
               },
               onError: function(errType) {
                 console.warn('[EPG] AVPlay error:', errType, 'falling back to Shaka');
@@ -1892,6 +1950,9 @@
                   updatePlayerEPG(n);
                   els.video.play().catch(function() {});
                   startPlayerTicker();
+                  if (isArchive && s) {
+                    seekShakaToArchive(s);
+                  }
                 }).catch(function(shakaErr) {
                   console.error('Shaka fallback error:', shakaErr);
                 });
@@ -1928,6 +1989,10 @@
           lastSeekBg = "";
           lastMiniBarWidth = "";
           startPlayerTicker();
+
+          if (isArchive && s) {
+            seekShakaToArchive(s);
+          }
 
           // Fallback timer removed - Shaka Player with mux.js manages MSE decoding directly
         } catch (e) {
@@ -2089,6 +2154,7 @@
         const clickNow = new Date();
         let s = p.start;
         let e = p.stop;
+        const isPastOrStart = s && s <= clickNow;
         if (s > clickNow) {
           s = null;
           e = null;
@@ -2097,9 +2163,9 @@
         }
         const mdNum = getMDMatch(p.title);
         if (mdNum) {
-          openOneplayModal(channel.name, p, s, e, mdNum);
+          openOneplayModal(channel.name, p, s, e, mdNum, isPastOrStart);
         } else {
-          resPl(channel.name, s, e);
+          resPl(channel.name, s, e, isPastOrStart);
         }
       }
 
@@ -2174,9 +2240,9 @@
             btnLive.onclick = () => {
               modal.classList.add("hidden");
               if (mdNum) {
-                openOneplayModal(channel.name, p, null, null, mdNum);
+                openOneplayModal(channel.name, p, null, null, mdNum, false);
               } else {
-                resPl(channel.name);
+                resPl(channel.name, null, null, false);
               }
             };
           }
@@ -2187,9 +2253,9 @@
             btnStart.onclick = () => {
               modal.classList.add("hidden");
               if (mdNum) {
-                openOneplayModal(channel.name, p, p.start, null, mdNum);
+                openOneplayModal(channel.name, p, p.start, null, mdNum, true);
               } else {
-                resPl(channel.name, p.start);
+                resPl(channel.name, p.start, null, true);
               }
             };
           }
@@ -2202,9 +2268,9 @@
             btnLive.onclick = () => {
               modal.classList.add("hidden");
               if (mdNum) {
-                openOneplayModal(channel.name, p, p.start, p.stop, mdNum);
+                openOneplayModal(channel.name, p, p.start, p.stop, mdNum, true);
               } else {
-                resPl(channel.name, p.start, p.stop);
+                resPl(channel.name, p.start, p.stop, true);
               }
             };
           }
@@ -4511,6 +4577,7 @@
         playStartTime,
         playEndTime,
         mdNum,
+        isArchive = false,
       ) {
         const modal = $("op-modal");
         if (!modal) return;
@@ -4540,7 +4607,7 @@
             '<div class="op-feed-sub">Původní vysílání</div>';
           btn.onclick = () => {
             modal.classList.add("hidden");
-            resPl(targetChannelName, playStartTime, playEndTime);
+            resPl(targetChannelName, playStartTime, playEndTime, isArchive);
           };
           mainGrid.appendChild(btn);
         }
@@ -4558,7 +4625,7 @@
             }
             btn.onclick = () => {
               modal.classList.add("hidden");
-              resPl(mdChName, playStartTime, playEndTime);
+              resPl(mdChName, playStartTime, playEndTime, isArchive);
             };
             mdGrid.appendChild(btn);
           }
