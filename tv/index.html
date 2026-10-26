@@ -1326,11 +1326,7 @@ window.addEventListener('beforeunload',()=>{
 <script>
 window.goBackToRozcestnik = function(e) {
   if (e && e.preventDefault) e.preventDefault();
-  if (window.history.length > 1) {
-    window.history.back();
-  } else {
-    window.location.href = '../index.html';
-  }
+  window.location.href = '../index.html';
 };
 if (window.self !== window.top) {
   var b = document.getElementById('top-back-btn');
