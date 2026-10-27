@@ -69,9 +69,7 @@
   (function loadAVPlayScript() {
     if (typeof window !== 'undefined' && typeof window.TizenAVPlay === 'undefined') {
       var isSubPage = window.location.pathname.indexOf('/tv/') !== -1 ||
-                      window.location.pathname.indexOf('/alt/') !== -1 ||
-                      window.location.href.indexOf('/tv/') !== -1 ||
-                      window.location.href.indexOf('/alt/') !== -1;
+                      window.location.href.indexOf('/tv/') !== -1;
       var scriptSrc = isSubPage ? '../tizen-avplay.js' : 'tizen-avplay.js';
       var el = document.createElement('script');
       el.src = scriptSrc;
@@ -441,14 +439,22 @@
       return true;
     }
 
-    // 9. Check subpage navigation (if in tv/*.html or alt/*.html): go back to main Rozcestník menu
+    // 9. Check subpage navigation (if in tv/*.html): go back to main Rozcestník menu
     var isSubPage = window.location.pathname.includes('/tv/') ||
-                    window.location.pathname.includes('/alt/') ||
-                    (window.location.href.includes('/tv/') || window.location.href.includes('/alt/'));
+                    window.location.href.includes('/tv/');
 
     if (isSubPage) {
       if (e && e.preventDefault) e.preventDefault();
       if (e && e.stopPropagation) e.stopPropagation();
+      if (typeof window.TizenAVPlay !== 'undefined') {
+        try { window.TizenAVPlay.stop(); } catch(err) {}
+      }
+      try {
+        if (typeof webapis !== 'undefined' && webapis.avplay) {
+          webapis.avplay.stop();
+          webapis.avplay.close();
+        }
+      } catch(err) {}
       window.location.href = '../index.html';
       return true;
     }

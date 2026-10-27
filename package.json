@@ -1,6 +1,6 @@
 {
   "name": "tizenbrew-rozcestnik",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Rozcestník TV module for TizenBrew on Samsung Smart TV",
   "main": "index.html",
   "serviceFile": "service.js",
