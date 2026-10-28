@@ -2,21 +2,92 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=../index.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rozcestník</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      user-select: none;
+    }
+    .brand {
+      font-size: 2.4rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #ffc629;
+      margin-bottom: 12px;
+    }
+    .msg {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+    }
+    .btn {
+      background: #ffc629;
+      color: #000;
+      padding: 14px 32px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 0 25px rgba(255, 198, 41, 0.5);
+      outline: none;
+      border: 2px solid transparent;
+      transition: transform 0.15s ease;
+      cursor: pointer;
+    }
+    .btn:focus, .btn:hover {
+      transform: scale(1.08);
+      border-color: #fff;
+    }
+  </style>
   <script>
-    try {
-      if (typeof webapis !== 'undefined' && webapis.avplay) {
-        webapis.avplay.stop();
-        webapis.avplay.close();
+    (function() {
+      var target = '../index.html';
+      try {
+        var cur = window.location.href;
+        if (cur.indexOf('/alt/') !== -1) {
+          target = cur.substring(0, cur.lastIndexOf('/alt/')) + '/index.html';
+        }
+      } catch (e) {}
+
+      try {
+        window.location.replace(target);
+      } catch (err) {
+        try { window.location.href = target; } catch (err2) {}
       }
-    } catch(e) {}
-    window.location.replace('../index.html');
+    })();
   </script>
 </head>
-<body style="background:#08090d;">
+<body>
+  <div class="brand">ROZCESTNÍK</div>
+  <div class="msg">Načítání Rozcestníku...</div>
+  <a id="btn-home" class="btn" href="../index.html" tabindex="0">Přejít na Rozcestník</a>
   <script>
-    window.location.replace('../index.html');
+    (function() {
+      try {
+        var btn = document.getElementById('btn-home');
+        if (btn) {
+          var cur = window.location.href;
+          if (cur.indexOf('/alt/') !== -1) {
+            btn.href = cur.substring(0, cur.lastIndexOf('/alt/')) + '/index.html';
+          }
+          btn.focus();
+          setTimeout(function() {
+            try { btn.click(); } catch(e) {}
+          }, 80);
+        }
+      } catch (e) {}
+    })();
   </script>
 </body>
 </html>

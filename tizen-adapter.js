@@ -446,15 +446,9 @@
     if (isSubPage) {
       if (e && e.preventDefault) e.preventDefault();
       if (e && e.stopPropagation) e.stopPropagation();
-      if (typeof window.TizenAVPlay !== 'undefined') {
+      if (typeof window.TizenAVPlay !== 'undefined' && typeof window.TizenAVPlay.stop === 'function') {
         try { window.TizenAVPlay.stop(); } catch(err) {}
       }
-      try {
-        if (typeof webapis !== 'undefined' && webapis.avplay) {
-          webapis.avplay.stop();
-          webapis.avplay.close();
-        }
-      } catch(err) {}
       window.location.href = '../index.html';
       return true;
     }
