@@ -68,6 +68,9 @@
   // ── 2b. Auto-load Samsung AVPlay Native Layer ─────────────────────────
   (function loadAVPlayScript() {
     if (typeof window !== 'undefined' && typeof window.TizenAVPlay === 'undefined') {
+      if (document.querySelector('script[src*="tizen-avplay.js"]')) {
+        return;
+      }
       var isSubPage = window.location.pathname.indexOf('/tv/') !== -1 ||
                       window.location.pathname.indexOf('/alt/') !== -1 ||
                       window.location.href.indexOf('/tv/') !== -1 ||
@@ -279,6 +282,7 @@
 
   function showExitToast() {
     try {
+      if (!document || !document.body) return;
       var t = document.getElementById('tb-exit-toast');
       if (!t) {
         t = document.createElement('div');
@@ -454,7 +458,15 @@
     }
 
     // 10. On main index.html: return to 'home' view if in another view
-    if (window.curV && window.curV !== 'home') {
+    var activeView = (window.curV && window.curV !== 'home') ? window.curV : null;
+    if (!activeView) {
+      var actEl = document.querySelector('.view.active');
+      if (actEl && actEl.id && actEl.id !== 'v-home') {
+        activeView = actEl.id.replace('v-', '');
+      }
+    }
+
+    if (activeView && activeView !== 'home') {
       if (e && e.preventDefault) e.preventDefault();
       if (e && e.stopPropagation) e.stopPropagation();
       if (typeof window.swV === 'function') {
@@ -463,25 +475,9 @@
       }
     }
 
-    // 11. If on main page home view: require double press to cleanly exit on Samsung Tizen TV
-    if (typeof tizen !== 'undefined' && tizen.application) {
-      if (e && e.preventDefault) e.preventDefault();
-      if (e && e.stopPropagation) e.stopPropagation();
-      var now = Date.now();
-      if (now - _lastBackPressTime < 2500) {
-        try {
-          tizen.application.getCurrentApplication().exit();
-          return true;
-        } catch (err) {
-          console.warn('Could not exit Tizen application:', err);
-        }
-      } else {
-        _lastBackPressTime = now;
-        showExitToast();
-        return true;
-      }
-    }
-
+    // 11. Main page home view: allow Back key to propagate to TizenBrew / host container.
+    // DO NOT preventDefault or stopPropagation so TizenBrew package manager can close/exit
+    // the module cleanly without locking up the TV.
     return false;
   }
 
