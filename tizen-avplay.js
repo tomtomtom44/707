@@ -12,9 +12,6 @@
 'use strict';
 
 (function(global) {
-  if (global.TizenAVPlay) {
-    return;
-  }
   var LOG_PREFIX = '[TizenAVPlay]';
   var MAX_RETRIES = 3;
   var RETRY_DELAY_MS = 1500;

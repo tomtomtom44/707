@@ -67,22 +67,17 @@
 
   // ── 2b. Auto-load Samsung AVPlay Native Layer ─────────────────────────
   (function loadAVPlayScript() {
-    try {
-      if (typeof window !== 'undefined' && typeof window.TizenAVPlay === 'undefined') {
-        if (typeof document !== 'undefined' && document.querySelector && document.querySelector('script[src*="tizen-avplay.js"]')) {
-          return;
-        }
-        var isSubPage = window.location.pathname.indexOf('/tv/') !== -1 ||
-                        window.location.pathname.indexOf('/alt/') !== -1 ||
-                        window.location.href.indexOf('/tv/') !== -1 ||
-                        window.location.href.indexOf('/alt/') !== -1;
-        var scriptSrc = isSubPage ? '../tizen-avplay.js' : 'tizen-avplay.js';
-        var el = document.createElement('script');
-        el.src = scriptSrc;
-        el.async = false;
-        (document.head || document.documentElement).appendChild(el);
-      }
-    } catch (e) {}
+    if (typeof window !== 'undefined' && typeof window.TizenAVPlay === 'undefined') {
+      var isSubPage = window.location.pathname.indexOf('/tv/') !== -1 ||
+                      window.location.pathname.indexOf('/alt/') !== -1 ||
+                      window.location.href.indexOf('/tv/') !== -1 ||
+                      window.location.href.indexOf('/alt/') !== -1;
+      var scriptSrc = isSubPage ? '../tizen-avplay.js' : 'tizen-avplay.js';
+      var el = document.createElement('script');
+      el.src = scriptSrc;
+      el.async = false;
+      (document.head || document.documentElement).appendChild(el);
+    }
   })();
 
   window.__tizenPlayStream = function(url, options) {
@@ -137,43 +132,41 @@
 
   // Global Shaka Player proxy interceptor
   function hookShakaProxy() {
-    try {
-      if (typeof window !== 'undefined' && window.shaka && window.shaka.Player && !window.shaka.Player._tbProxyHooked) {
-        window.shaka.Player._tbProxyHooked = true;
-        var origLoad = window.shaka.Player.prototype.load;
-        window.shaka.Player.prototype.load = function(assetUri, startTime, mimeType) {
-          var u = assetUri;
-          if (typeof u === 'string' && window.__TB_PROXY_ACTIVE__ && /^https?:\/\//i.test(u)) {
-            u = wrapWithProxy(u);
-          }
-          return origLoad.call(this, u, startTime, mimeType);
-        };
+    if (typeof window !== 'undefined' && window.shaka && window.shaka.Player && !window.shaka.Player._tbProxyHooked) {
+      window.shaka.Player._tbProxyHooked = true;
+      var origLoad = window.shaka.Player.prototype.load;
+      window.shaka.Player.prototype.load = function(assetUri, startTime, mimeType) {
+        var u = assetUri;
+        if (typeof u === 'string' && window.__TB_PROXY_ACTIVE__ && /^https?:\/\//i.test(u)) {
+          u = wrapWithProxy(u);
+        }
+        return origLoad.call(this, u, startTime, mimeType);
+      };
 
-        var origAttach = window.shaka.Player.prototype.attach;
-        window.shaka.Player.prototype.attach = function(mediaEl, opt_init) {
-          var res = origAttach.call(this, mediaEl, opt_init);
-          try {
-            var netEngine = this.getNetworkingEngine && this.getNetworkingEngine();
-            if (netEngine && !this._tbProxyFilterRegistered) {
-              this._tbProxyFilterRegistered = true;
-              netEngine.registerRequestFilter(function(type, request) {
-                if (window.__TB_PROXY_ACTIVE__ && request && request.uris && request.uris.length) {
-                  for (var i = 0; i < request.uris.length; i++) {
-                    var curUri = request.uris[i];
-                    if (typeof curUri === 'string' && /^https?:\/\//i.test(curUri)) {
-                      if (curUri.indexOf(PROXY_HOST) !== 0) {
-                        request.uris[i] = wrapWithProxy(curUri);
-                      }
+      var origAttach = window.shaka.Player.prototype.attach;
+      window.shaka.Player.prototype.attach = function(mediaEl, opt_init) {
+        var res = origAttach.call(this, mediaEl, opt_init);
+        try {
+          var netEngine = this.getNetworkingEngine && this.getNetworkingEngine();
+          if (netEngine && !this._tbProxyFilterRegistered) {
+            this._tbProxyFilterRegistered = true;
+            netEngine.registerRequestFilter(function(type, request) {
+              if (window.__TB_PROXY_ACTIVE__ && request && request.uris && request.uris.length) {
+                for (var i = 0; i < request.uris.length; i++) {
+                  var curUri = request.uris[i];
+                  if (typeof curUri === 'string' && /^https?:\/\//i.test(curUri)) {
+                    if (curUri.indexOf(PROXY_HOST) !== 0) {
+                      request.uris[i] = wrapWithProxy(curUri);
                     }
                   }
                 }
-              });
-            }
-          } catch (e) {}
-          return res;
-        };
-      }
-    } catch (err) {}
+              }
+            });
+          }
+        } catch (e) {}
+        return res;
+      };
+    }
   }
   hookShakaProxy();
   if (document.readyState === 'loading') {
@@ -449,17 +442,13 @@
     }
 
     // 9. Check subpage navigation (if in tv/*.html or alt/*.html): go back to main Rozcestník menu
-    var isSubPage = window.location.pathname.indexOf('/tv/') !== -1 ||
-                    window.location.pathname.indexOf('/alt/') !== -1 ||
-                    window.location.href.indexOf('/tv/') !== -1 ||
-                    window.location.href.indexOf('/alt/') !== -1;
+    var isSubPage = window.location.pathname.includes('/tv/') ||
+                    window.location.pathname.includes('/alt/') ||
+                    (window.location.href.includes('/tv/') || window.location.href.includes('/alt/'));
 
     if (isSubPage) {
       if (e && e.preventDefault) e.preventDefault();
       if (e && e.stopPropagation) e.stopPropagation();
-      if (typeof window.TizenAVPlay !== 'undefined' && typeof window.TizenAVPlay.stop === 'function') {
-        try { window.TizenAVPlay.stop(); } catch(err) {}
-      }
       window.location.href = '../index.html';
       return true;
     }

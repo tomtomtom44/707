@@ -3,100 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="0; url=../index.html">
-  <title>Rozcestník</title>
-  <script src="../tizen-adapter.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0a0a0a;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      width: 100vw;
-      text-align: center;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .brand {
-      font-size: 2.5rem;
-      font-weight: 900;
-      letter-spacing: 4px;
-      color: #ffc629;
-      margin-bottom: 12px;
-      text-shadow: 0 0 20px rgba(255, 198, 41, 0.4);
-    }
-    .msg {
-      color: #a1a1aa;
-      font-size: 1.1rem;
-      margin-bottom: 28px;
-    }
-    .btn {
-      background: #ffc629;
-      color: #0a0a0a;
-      padding: 14px 36px;
-      border-radius: 30px;
-      font-weight: 800;
-      font-size: 1.15rem;
-      text-decoration: none;
-      display: inline-block;
-      box-shadow: 0 0 25px rgba(255, 198, 41, 0.5);
-      outline: none;
-      border: 3px solid transparent;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      cursor: pointer;
-    }
-    .btn:focus, .btn:hover {
-      transform: scale(1.08);
-      border-color: #fff;
-      box-shadow: 0 0 35px rgba(255, 198, 41, 0.9);
-    }
-  </style>
+  <title>Přesměrování na Rozcestník...</title>
   <script>
-    (function() {
-      function redirectToHome() {
-        var target = '../index.html';
-        try {
-          var cur = window.location.href;
-          if (cur.indexOf('/alt/') !== -1) {
-            target = cur.substring(0, cur.lastIndexOf('/alt/')) + '/index.html';
-          }
-        } catch (e) {}
-        try {
-          window.location.replace(target);
-        } catch (err) {
-          try { window.location.href = target; } catch (err2) {}
-        }
-      }
-      redirectToHome();
-      document.addEventListener('DOMContentLoaded', redirectToHome);
-    })();
+    window.location.replace('../index.html');
   </script>
 </head>
-<body>
-  <div class="brand">ROZCESTNÍK</div>
-  <div class="msg">Načítání hlavního menu Rozcestníku...</div>
-  <a id="btn-home" class="btn" href="../index.html" tabindex="0" autofocus>Přejít na Rozcestník</a>
-  <script>
-    (function() {
-      try {
-        var btn = document.getElementById('btn-home');
-        if (btn) {
-          var cur = window.location.href;
-          if (cur.indexOf('/alt/') !== -1) {
-            btn.href = cur.substring(0, cur.lastIndexOf('/alt/')) + '/index.html';
-          }
-          btn.focus();
-          setTimeout(function() {
-            try { btn.click(); } catch(e) {}
-          }, 60);
-        }
-      } catch (e) {}
-    })();
-  </script>
+<body style="background:#000;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;margin:0;">
+  <p>Přesměrování na hlavní menu Rozcestníku...</p>
 </body>
 </html>
